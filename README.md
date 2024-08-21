@@ -22,37 +22,38 @@ The following tools and technologies were used in this project:
 
 ## Insights
 -This Project will focus on answering the following questions:
-What’s the Operating System of the Server?
-What’s the Operating System of the Desktop?
-What was the local time of the Server?
-Was there a breach?
-What was the initial entry vector (how did they get in)?
-Was malware used? If so what was it? If there was malware answer the following:
-What process was malicious?
-Identify the IP Address that delivered the payload.
-What IP Address is the malware calling to?
-Where is this malware on disk?
-When did it first appear?
-Did someone move it?
-What were the capabilities of this malware?
-Is this malware easily obtained?
-Was this malware installed with persistence on any machine?
-When?
-Where?
-What malicious IP Addresses were involved?
-Were any IP Addresses from known adversary infrastructure?
-Are these pieces of adversary infrastructure involved in other attacks around the time of the attack?
-Did the attacker access any other systems?
-How?
-When?
-Did the attacker steal or access any data?
-When?
-What was the network layout of the victim network?
-What architecture changes should be made immediately?
-Did the attacker steal the Szechuan sauce? If so, what time?
-Did the attacker steal or access any other sensitive files? If so, what times?
-Finally, when was the last known contact with the adversary?
+- a. What’s the Operating System of the Server?
+- b.What’s the Operating System of the Desktop?
+- c. What was the local time of the Server?
+- d. Was there a breach?
+- e. What was the initial entry vector (how did they get in)?
+- f. Was malware used? If so what was it? If there was malware answer the following:
+- What process was malicious?
+- Identify the IP Address that delivered the payload.
+- What IP Address is the malware calling to?
+- Where is this malware on disk?
+- When did it first appear?
+- Did someone move it?
+- What were the capabilities of this malware?
+- Is this malware easily obtained?
+- Was this malware installed with persistence on any machine?
+- When?
+- Where?
+- g. What malicious IP Addresses were involved?
+- Were any IP Addresses from known adversary infrastructure?
+- Are these pieces of adversary infrastructure involved in other attacks around the time of the attack?
+- h. Did the attacker access any other systems?
+- How?
+- When?
+- i. Did the attacker steal or access any data?
+- When?
+- j. What was the network layout of the victim network?
+- k. What architecture changes should be made immediately?
+- l. Did the attacker steal the Szechuan sauce? If so, what time?
+- m. Did the attacker steal or access any other sensitive files? If so, what times?
+- n. Finally, when was the last known contact with the adversary?
 
+## Project Report
 [The Stolen Szechuan Sauce - Google Docs.pdf](https://github.com/user-attachments/files/16687394/The.Stolen.Szechuan.Sauce.-.Google.Docs.pdf)
 
 
