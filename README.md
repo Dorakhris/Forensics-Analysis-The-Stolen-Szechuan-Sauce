@@ -21,7 +21,7 @@ The following tools and technologies were used in this project:
 - **Python**: For scripting and automating parts of the analysis.
 
 ## Insights
--This Project will focus on answering the following questions:
+- This Project will focus on answering the following questions:
 - a. What’s the Operating System of the Server?
 - b.What’s the Operating System of the Desktop?
 - c. What was the local time of the Server?
