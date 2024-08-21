@@ -53,6 +53,7 @@ Did the attacker steal the Szechuan sauce? If so, what time?
 Did the attacker steal or access any other sensitive files? If so, what times?
 Finally, when was the last known contact with the adversary?
 
+[The Stolen Szechuan Sauce - Google Docs.pdf](https://github.com/user-attachments/files/16687394/The.Stolen.Szechuan.Sauce.-.Google.Docs.pdf)
 
 
 ## Conclusion
