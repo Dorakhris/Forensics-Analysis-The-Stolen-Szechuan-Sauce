@@ -4,6 +4,7 @@
 This project simulates a digital forensics investigation into the theft of a proprietary "Szechuan Sauce" recipe, inspired by the DFIR Madness CTF challenge. As a Blue Team analyst, I analyzed disk images, memory dumps, and network traffic to trace the attacker’s actions, identify malware, and recommend mitigations. Using tools like Autopsy, Wireshark, FTK Imager, and Python, I answered 14 investigative questions, mapping threats to MITRE ATT&CK and aligning recommendations with NIST 800-53 and ISO 27001. This project showcases my skills in Digital Forensics and Incident Response (DFIR), Security Operations Center (SOC) operations, Threat Intelligence, and Governance, Risk, and Compliance (GRC).
 
 **Date**: September 2024
+
 **Analyst**: Dorathy Christopher
 
 ## Introduction
