@@ -1,87 +1,61 @@
-# Forensics Analysis: The Stolen Szechuan Sauce
+# Digital Forensics Case Study: The Stolen Szechuan Sauce
 
-## Overview
-This project simulates a digital forensics investigation into the theft of a proprietary "Szechuan Sauce" recipe, inspired by the DFIR Madness CTF challenge. As a Blue Team analyst, I analyzed disk images, memory dumps, and network traffic to trace the attacker’s actions, identify malware, and recommend mitigations. Using tools like Autopsy, Wireshark, FTK Imager, and Python, I answered 14 investigative questions, mapping threats to MITRE ATT&CK and aligning recommendations with NIST 800-53 and ISO 27001. This project showcases my skills in Digital Forensics and Incident Response (DFIR), Security Operations Center (SOC) operations, Threat Intelligence, and Governance, Risk, and Compliance (GRC).
+## Executive Summary
+This report details a full-scale digital forensics and incident response (DFIR) investigation into a data breach involving the theft of a proprietary recipe. Inspired by a CTF challenge, this case study simulates a real-world scenario where an attacker breached the network, moved laterally, deployed malware, and exfiltrated sensitive data.
 
-**Date**: September 2024
+Using a comprehensive toolkit including **Autopsy, Wireshark, FTK Imager, and Volatility**, I performed a forensic analysis of disk images, memory dumps, and network captures. The investigation successfully reconstructed the entire attack chain, from the initial **RDP brute-force** entry to the deployment of a **Cobalt Strike/Meterpreter payload** and the final data exfiltration.
 
-**Analyst**: Dorathy Christopher
+All findings are mapped to the **MITRE ATT&CK framework**, and the report concludes with a set of strategic hardening recommendations aligned with **NIST 800-53** and **ISO 27001**, demonstrating an end-to-end DFIR and GRC capability.
 
-## Introduction
-Inspired by the "Rick and Morty" themed DFIR Madness challenge, this project investigates the theft of a Szechuan sauce recipe found on the dark web. By analyzing digital artifacts (disk images, PCAPs, memory dumps), I traced the attacker’s entry vector, malware deployment, and data exfiltration, demonstrating real-world DFIR techniques to solve cybercrimes.
+**Date:** September 2024
 
-## Objectives
+**Analyst:** Dorathy Christopher
 
-- Simulate a real-world DFIR investigation to track a data breach.
-- Analyze digital artifacts (logs, registry hives, network traffic, metadata).
-- Identify the perpetrator, attack methods, and stolen data.
-- Recommend architecture and policy improvements to prevent future breaches.
+---
 
-## Tools and Technologies
+The investigation revealed a clear, multi-stage attack lifecycle. I traced the attacker's actions chronologically through forensic artifacts.
 
-**Autopsy**: Analyzed disk images (E01 files) for file system artifacts, registry hives, and deleted files.
+### Phase 1: Initial Access & Reconnaissance
+*   **Vector:** Remote Desktop Protocol (RDP) Brute-Force
+*   **Evidence:** Analysis of network traffic (`.pcap` file in Wireshark) and Windows Event Logs (`Security.evtx` in Autopsy) revealed a high volume of failed login attempts (**Event ID 4625**) originating from the IP address `194.61.24.102`.
+*   **Success:** On **2020-09-19 at 02:19:13 UTC-7**, the attacker successfully authenticated to the domain controller `DC01` (10.42.85.10) as the Administrator.
 
-**Wireshark**: Examined PCAP files for network traffic, identifying RDP brute-forcing and malware communication.
+### Phase 2: Execution & Persistence
+*   **Payload Delivery:** Immediately following the successful login, the attacker used the established RDP session to download the primary payload, `coreupdater.exe`, from their IP (`194.61.24.102`) via an unencrypted HTTP transfer.
+*   **Malware Deployed:** Analysis of the `coreupdater.exe` hash on VirusTotal and memory forensics using **Volatility** confirmed it to be a **Cobalt Strike/Meterpreter beacon**. It was found running under the guise of a legitimate process name, `spoolsv.exe`, to evade detection.
+*   **Persistence Mechanism:** The attacker established persistence by installing the malware as a Windows service named "coreupdater". This was confirmed by analyzing the `SYSTEM` registry hive (`ControlSet001\Services\coreupdater`) in Autopsy, ensuring the malware would survive a reboot.
 
-**FTK Imager**: Created forensic images and extracted file metadata (e.g., MFT, USN journal).
+### Phase 3: Lateral Movement
+*   **Objective:** Having compromised the domain controller, the attacker moved to another system on the network to locate valuable data.
+*   **Action:** Using the compromised `Administrator` account, the attacker made a successful RDP connection from `DC01` to the workstation `DESKTOP-SDN1RPT`.
+*   **Evidence:** This lateral movement was logged as **Event ID 4624** (An account was successfully logged on) in the security event logs of the workstation, timestamped at **2020-09-19 02:36:24 UTC-7**.
 
-**Python**: Scripted log parsing and hash calculations for malware analysis.
+### Phase 4: Impact & Data Exfiltration
+*   **Data Staging & Access:** Once on the workstation, the attacker accessed a network share `C:\FileShare\Secret`. File system journaling (USN Journal and MFT analysis in Autopsy) shows access to two key files: `Szechuan_Sauce_Recipe.txt` and `Beth_Secret.txt` at **2020-09-19 02:29:39 UTC-7**.
+*   **Command & Control (C2):** Network traffic analysis in Wireshark revealed sustained TCP communication from the compromised host to the IP address `203.78.103.109`, a known malicious C2 server. This channel was likely used for data exfiltration.
+*   **Anti-Forensics:** The attacker attempted to hide their tracks by performing "time stomping" on the `SECRET_bath.txt` file, altering its timestamps to mislead investigators.
 
-**Volatility**: Conducted memory forensics to identify malicious processes.
+---
 
-**VirusTotal**: Validated malicious IPs and file hashes.
+## Indicators of Compromise (IoCs)
 
-## Investigative Questions and Findings
-The investigation answered 14 key questions to uncover the breach details:
+| Type | Indicator | Description |
+| :--- | :--- | :--- |
+| **IP Address** | `194.61.24.102` | Attacker IP for RDP brute-force and payload delivery. |
+| **IP Address** | `203.78.103.109` | Malicious Command & Control (C2) server. |
+| **File Hash (SHA256)** | `(Hash of coreupdater.exe)` | Cobalt Strike/Meterpreter payload. |
+| **File Path** | `C:\Windows\System32\coreupdater.exe` | Location of the dropped malware. |
+| **Process Name** | `spoolsv.exe` | Malicious process masquerading as a system process. |
+| **Registry Key** | `HKLM\SYSTEM\ControlSet001\Services\coreupdater` | Malware persistence as a service. |
 
-- **Operating System of the Server**: Windows Server 2012 R2 Standard Evaluation (parsed via Autopsy from SOFTWARE hive: C:\Windows\System32\config\SOFTWARE\Microsoft\Windows NT\CurrentVersion).
-- **Operating System of the Desktop**: Windows 10 Enterprise, build 19041 (identified via Autopsy’s OS Information module).
-- **Local Time of the Server**: Pacific Standard Time (UTC-7), misconfigured on the domain controller (verified via SYSTEM hive in Autopsy and NTP packets in Wireshark).
-- **Was There a Breach?**: Yes, unauthorized access occurred via RDP brute-forcing (Event ID 4625 logs analyzed in Autopsy).
-- **Initial Entry Vector**: RDP brute-force attack from IP 194.61.24.102 targeting port 3389 on 2020-09-19 02:19:13 UTC-7 (Wireshark filter: rdp && ip.src == 194.61.24.102).
+---
 
-### Malware Usage:
-**Malicious Process**: spoolsv.exe (Meterpreter payload, identified via Volatility’s pslist plugin).
+## Strategic Recommendations
+To prevent similar incidents, the following architecture and policy changes are recommended:
 
-**IP Delivering Payload**: 194.61.24.102 (delivered coreupdater.exe via HTTP, Wireshark HTTP export).
-
-**Malware C2 IP**: 203.78.103.109 (TCP connection in Wireshark, flagged in VirusTotal).
-
-**Malware Location**: C:\Windows\System32\coreupdater.exe (originally in Downloads folder, moved per MFT in Autopsy).
-
-**First Appearance**: 2020-09-19 02:24:12 UTC (MFT and USN journal in Autopsy).
-
-**Moved?**: Yes, from Downloads to System32 (USN journal parent entry 84880).
-
-**Capabilities**: Data exfiltration, persistence via registry (Meterpreter framework, VirusTotal flagged as Cobalt Strike).
-
-**Easily Obtained?**: Yes, built on Cobalt Strike, widely available on dark web.
-
-**Persistence?**: Yes, installed as a service (ControlSet001\Services\coreupdater) on DC01 (2020-09-19 03:27:49 UTC-6) and DESKTOP-SDN1RPT (2020-09-19 03:44:42 UTC-6).
-
-
-**Malicious IPs**: 194.61.24.102 (RDP brute-force, payload delivery), 203.78.103.109 (C2 communication). Both flagged as malicious in VirusTotal.
-
-**Adversary Infrastructure**: 194.61.24.102 linked to RDP brute-force campaigns (OSINT via VirusTotal). Insufficient data on other attacks at the time.
-
-**Other Systems Accessed**: Yes, lateral movement from DC01 to DESKTOP-SDN1RPT via compromised Administrator account on 2020-09-19 02:36:24 UTC-7 (Event ID 4624, Autopsy Security.evtx).
-
-**Data Stolen/Accessed**: Yes, Szechuan sauce recipe and Beth_Secret.txt accessed from C:\FileShare\Secret on 2020-09-19 02:29:39 UTC-7 (Autopsy UsrClass.dat).
-
-**Network Layout**: Two systems (DC01: 10.42.85.10, DESKTOP-SDN1RPT) connected via internal network, externally accessible via RDP (Autopsy Tcpip Parameters).
-
-## Architecture Changes:
-- Disable external RDP access (NIST 800-53 AC-17).
-- Implement MFA for all accounts (NIST 800-53 IA-2).
-- Deploy Network Intrusion Detection System (e.g., Zeek) (ISO 27001 A.12.4.1).
-- Enforce least privilege via RBAC (NIST 800-53 AC-6).
-
-
-**Szechuan Sauce Theft**: Stolen on 2020-09-19 02:29:39 UTC-7 (Autopsy file access logs).
-
-**Other Sensitive Files**: Beth_Secret.txt accessed on 2020-09-19 02:29:39 UTC-7; SECRET_bath.txt showed time stomping (Autopsy metadata).
-
-**Last Known Contact**: 2020-09-19 02:57:00 UTC (Wireshark TCP traffic to 203.78.103.109).
-
-## Conclusion
-This project demonstrates a comprehensive DFIR investigation, tracing an RDP brute-force attack, Cobalt Strike malware deployment, and data exfiltration. By leveraging Autopsy, Wireshark, FTK Imager, Volatility, and Python, I identified the attacker’s tactics (MITRE ATT&CK T1190, T1486) and recommended NIST-aligned mitigations. The investigation highlights the critical role of digital forensics in uncovering cybercrimes and strengthening defenses.
+| Recommendation | Justification & Business Value | Framework Alignment |
+| :--- | :--- | :--- | :--- |
+| **Disable External RDP Access** | The initial access vector was a publicly exposed RDP port. Disabling this and requiring access via a secure VPN gateway eliminates this entire attack surface. | **NIST 800-53:** AC-17 <br> **ISO 27001:** A.13.1.1 |
+| **Enforce Multi-Factor Authentication (MFA)** | Even with a compromised password, MFA would have prevented the initial successful login, stopping the attack before it began. | **NIST 800-53:** IA-2 <br> **ISO 27001:** A.9.4.3 |
+| **Implement Network Segmentation & an IDS** | A properly segmented network would have limited the attacker's ability to move laterally from the DC. An IDS (like Zeek or Snort) would have alerted on the brute-force attempt and C2 traffic. | **NIST 800-53:** SC-7 <br> **ISO 27001:** A.12.4.1, A.13.1.3 |
+| **Apply the Principle of Least Privilege** | The use of a domain administrator account for daily tasks enabled trivial lateral movement. Implementing Role-Based Access Control (RBAC) ensures accounts only have the minimum necessary permissions. | **NIST 800-53:** AC-6 <br> **ISO 27001:** A.9.2.3 |
