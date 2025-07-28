@@ -54,7 +54,7 @@ The attacker gained initial access by brute-forcing an RDP password for the Admi
 | **C2 Server** | IP: `203.78.103.109` | The malware established a persistent TCP connection to this IP for command and control. VirusTotal confirmed it was malicious. |
 | **Persistence** | Registry: `ControlSet001\Services\coreupdater` | The malware was installed as a system service to ensure it would survive a system reboot (MITRE T1543.003). |
 | **Lateral Movement** | Event Log ID 4624 (DESKTOP-SDN1RPT) | The attacker used the compromised Administrator account to RDP from the DC to the desktop machine. |
-| **Data Exfiltration** | File Access: `C:\FileShare\Secret\` | The attacker accessed the "Szechuan sauce recipe" and "Beth_Secret.txt" files on 2020-09-19 at 02:29 UTC-7. |
+| **Data Exfiltration** | File Access: `C:\FileShare\Secret\Beth_Secret.txt` | The attacker accessed the "Szechuan sauce recipe" and "Beth_Secret.txt" files on 2020-09-19 at 02:29 UTC-7. |
 
 
 
