@@ -16,7 +16,7 @@
 | **Wireshark** | Deep-dive analysis of network traffic to identify the initial brute-force attack and the malware C2 communication. |
 | **Volatility / Registry Explorer** | Memory forensics and registry analysis to identify malicious processes and persistence mechanisms. |
 | **VirusTotal / AbuseIPDB** | OSINT tools used to verify the maliciousness of identified IP addresses and file hashes. |
-| **OS/VM Used** | Windows Server 2012 R2, Windows 10 (Targets) / Kali Linux SIFT Workstation (Analysis). |
+
 
 
 
